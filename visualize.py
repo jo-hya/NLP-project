@@ -104,7 +104,20 @@ tokens = [t for t in tokens if t not in stopwords]
 counter = Counter(tokens)
 top100 = counter.most_common(100)
 
-# print top 20 to console for quick inspection
+# print to console
 print("Top 20 words:")
 for w, c in top100:
     print(f"{w}: {c}")
+
+# make a horizontal bar plot of the most common words (from top100)
+top_df = pd.DataFrame(top100, columns=["word", "count"])
+# determine figure height dynamically
+height = max(6, len(top_df) * 0.25)
+plt.figure(figsize=(10, height))
+sns.barplot(x="count", y="word", data=top_df.sort_values("count", ascending=False))
+plt.title("Top Words in Reviews")
+plt.xlabel("Count")
+plt.ylabel("Word")
+plt.tight_layout()
+plt.savefig("top_words_bar.png")
+plt.show()
