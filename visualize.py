@@ -6,7 +6,6 @@ import re
 import string
 import unicodedata
 from collections import Counter
-import csv
 
 data_path = Path(__file__).parent
 reviews = pd.read_csv(data_path / "tCF Review Data - reviews_last_8y.csv")
