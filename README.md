@@ -1,5 +1,7 @@
 # NLP-project
 
+NOTE: This project was developed and evaluated inside Google Colab to utilize cloud GPU resources. The final production-ready scripts and notebooks have been consolidated here for version control and portfolio presentation. Thus, everything was committed to the main branch directly.
+
 An NLP-based project built to classify user-generated course reviews for theCourseForum at UVA and help solve the issue of misclassification of reviews with context-dependent language. For example, a review may use profanity or words with a negative connotation in a positive context, leading to unnecessary. Thus, we use a BERT-based model for context-aware sentiment analysis and moderation of course reviews to distinguish between harmful or inappropriate reviews from constructive but strongle worded ones. The goal is to help theCourseForum balance safety for UVA students and professors while supporting open and authentic feedback.
 
 ## NLP Pipeline
