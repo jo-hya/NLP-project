@@ -99,7 +99,7 @@ def tokenize_data(X_train, X_test, tokenizer_name="distilbert-base-uncased-finet
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-    return train_input_ids, train_attention_mask, train_metadata, y_train, test_input_ids, test_attention_mask, test_metadata, y_test, data_collator
+    return tokenizer, train_input_ids, train_attention_mask, train_metadata, y_train, test_input_ids, test_attention_mask, test_metadata, y_test, data_collator
 
 # also could potentially use dropout layers
 
@@ -186,7 +186,7 @@ def define_optimizer(custom_model):
     )
     return optimizer
 
-def define_training_arguments(output_dir="./results", num_train_epochs=5, per_device_train_batch_size=16, per_device_eval_batch_size=16, weight_decay=0.01, logging_dir="./logs", logging_steps=100):
+def define_training_arguments(output_dir="./results", num_train_epochs=5, per_device_train_batch_size=16, per_device_eval_batch_size=16, weight_decay=0.01, logging_dir="./logs", logging_steps=100):  
     training_args = TrainingArguments(
         output_dir=output_dir,           # Directory for saving model checkpoints
         eval_strategy="epoch",     # Evaluate at the end of each epoch
@@ -204,12 +204,6 @@ def define_training_arguments(output_dir="./results", num_train_epochs=5, per_de
         report_to="none"
     )
     return training_args
-
-def compute_metrics(eval_pred):
-    f1_metric = load("f1")
-    logits, labels = eval_pred
-    predictions = logits.argmax(axis=-1)
-    return {"f1_macro":f1_metric.compute(predictions=predictions, references=labels, average="macro")["f1"], "f1_weighted":f1_metric.compute(predictions=predictions, references=labels, average="weighted")["f1"]}
 
 class ReviewsDataset(Dataset):
     def __init__(self, input_ids, attention_mask, labels, metadata):
@@ -241,7 +235,12 @@ def create_datasets(tokenizer, train_input_ids, train_attention_mask, y_train, t
     test_dataset = ReviewsDataset(test_input_ids, test_attention_mask, y_test, test_metadata)
     return train_dataset, val_dataset, test_dataset
 
-def define_trainer(custom_model, train_dataset, val_dataset, training_args, compute_metrics, tokenizer, data_collator, optimizer):
+def define_trainer(custom_model, train_dataset, val_dataset, training_args, tokenizer, data_collator, optimizer):
+    def compute_metrics(eval_pred):
+        f1_metric = load("f1")
+        logits, labels = eval_pred
+        predictions = logits.argmax(axis=-1)
+        return {"f1_macro":f1_metric.compute(predictions=predictions, references=labels, average="macro")["f1"], "f1_weighted":f1_metric.compute(predictions=predictions, references=labels, average="weighted")["f1"]}
     # Define the Trainer
     trainer = Trainer(
         model=custom_model,
